@@ -221,6 +221,11 @@ FS HOST
                                         var/                            
                                             logs/
                                                  nginx.log   <<< Los archivos de log del nginx
+                                        var/
+                                            nginx/
+                                                web/ ~> Una carpeta que tengo en otro servidor
+                                                     ~> Una carpeta del host
+                                                            /home/ubuntu/web
                                 minginx/                                        (3)
                                         var/                            
                                             logs/
@@ -230,6 +235,8 @@ FS HOST
                                                 web/ ~> Una carpeta que tengo en otro servidor
                                                      ~> Una carpeta del host
                                                             /home/ubuntu/web
+                                        etc/    
+                                            nginx/nginx.conf <<< Inyectar de otro sitio
                                 instalacionWeblogicYAppHomeBancking
                                     /usr/oracle/weblogic
                                     /home/caixabank/homebanking.war
@@ -243,7 +250,7 @@ FS HOST
                                             bash
                                             env
                                         etc/    
-                                            nginx/          <<< Configuración del nginx
+                                            nginx/nginx.conf          <<< Configuración del nginx
                                         var/                            
                                             logs/
                                                        
@@ -459,6 +466,16 @@ Es la herramienta que hoy en día opera los entornos de producción de las empre
 - Administra cargas de trabajo y servicios
              |---------------|   |-------|
                Escalabilidad      HA: Balanceador de carga
+
+             pod                 service
+             pod template           - clusterip
+             deployment             - nodeport
+             statefulset            - loadbalancer
+             daemonset           ingress
+             
+             job
+             cronjob
+
 
 - Gestiona, implementa y escala aplicaciones contenedorizadas
 
