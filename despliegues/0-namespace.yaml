@@ -1,0 +1,14 @@
+kind:           Namespace   # Tipo de objeto que voy a crear
+apiVersion:     v1
+                # En kubernetes, cada tipo de objeto/configruación
+                # Se define en una libreria
+                # Kubernetes es EXTENSIBLE, le puedo poner MAS LIBRERIAS ENCIMA
+                # Esas librerias permiten añadir NUEVOS TIPOS de configuraciones
+                # con su respectiva funcionalidad.
+                # Aqui pondriamos LIBRERIA/VERSION
+                # La libreria BASICA DE KUBERNETES no tiene nombre
+
+metadata:       # Otros datos de interes
+    name:       ivan # NOMBRE que se considerá IDENTIFICADOR del objeto/configruacion
+    #labels:    # ETIQUETAS QUE PUEDO poner para catalogar los objetos / configuraciones
+                # Kubernetes hace uso INTENSIVO de esatas etiquetas

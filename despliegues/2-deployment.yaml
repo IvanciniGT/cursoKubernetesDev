@@ -1,0 +1,20 @@
+kind:           Deployment   
+apiVersion:     apps/v1
+
+metadata:       
+    name:       deployment-ivan 
+
+spec:
+    replicas:       10
+    selector:
+        matchLabels:
+                app:    miwebserver
+    template:
+        metadata:       
+            name:       plantilla-pod-ivan 
+            labels: 
+                app:    miwebserver
+        spec:
+            containers:
+                -   name:  contenedor1
+                    image: nginx:1.23

@@ -1,0 +1,12 @@
+kind:           Pod   
+apiVersion:     v1
+
+metadata:       
+    name:       pod-ivan 
+    #namespace:  ivan       ESO NO SE HACE NUNCA
+                            # Posiblemente esto querré desplegarlo en varios ns: desarrollo, produccion, pre...
+
+spec:
+    containers:
+        -   name:  contenedor1
+            image: nginx:1.23
