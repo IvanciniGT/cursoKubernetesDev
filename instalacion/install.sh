@@ -5,7 +5,7 @@ sudo apt -y upgrade
 
 sudo apt -y install curl apt-transport-https
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-// echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+# echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
 
 # Disable Swap 
@@ -79,6 +79,7 @@ kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 
 curl https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml -O
 
+### MODIFICAR FICHERO
 kubectl apply -f calico.yaml
 
 

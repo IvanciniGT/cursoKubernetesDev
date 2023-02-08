@@ -1,0 +1,176 @@
+# En YAML puedo meter comentarios . ALELUYA !!!! que en json no puedo
+# YAML es un lenguaje para estructurar información.
+# Sería una alternativa a XML o JSON
+# En un fichero YAML, puedo tener MONTONOES de documentos YAML, cosa que no permiten ni XML ni JSON. ALELUYA !
+# Para indicar que un documento comienza usamos:
+---
+# Esos tres guiones son opcioanles en el primer documento
+# Para indicar que un documento acaba usamos: 
+...
+# Aunque esos son opcionales, ya que si pongo 3 guiones indicando que un documento comienza,
+# ya se sobreentiende que el anterior acaba. 
+# Aunque no siempre esto es así. 
+# Es poco habitual en ficheros encontrar los tres puntos... DE FRIKIS !
+---
+# Un documento YAML contiene UN NODO
+# En YAML hay 2 grandes tipos de NODOS: Nodos escalares y nodos de colleccion
+---
+# Nodos escalares: Albergan un UNICO valor
+---
+# Número
+4
+-3.9
+#-.Inf
+#.nan
+---
+# Valores lógicos:
+True        # true TRUE True
+False       # false FALSE False
+# Ojo, a veces podreis encontrar:
+# YES
+# Yes
+# yes
+# y
+# no
+# NO
+# No
+# n
+# ON
+# On
+# on
+# off
+# OFF
+# Off
+# Hoy en día estamos en spec 1.2 de YAML... Y estas cosas YA NO SON VALIDAS (antes lo eran)
+# Al pasar a spec 1.2 de YAML LA CAGARON. Al haberlo quitado sin DEPRECARLO primero, fue el caos. 
+# Y la mayor parde de los programas que leen YAML siguen admitiendo algunas de esas sintaxis. FUERA DE ESPECIFICACION.
+# No os confieis
+---
+# Textos SON LO MAS COMPLEJO CON MUCHISIMA DIFERENCIA en YAML
+h'o"la #amigo
+---
+"h'o\"la #amigo"
+---
+'h''o"la #amigo'
+---
+hola \namigo
+
+como estas
+---
+"hola \namigo
+
+como estas"
+---
+'hola \namigo
+
+como estas'
+---
+# Adicionalmente a estas sintaxis hay otras 2 en textos
+# que usamos MUCHISIMO
+# - Literal
+# - folded
+---
+# Literal
+|-4
+        Empieza aqui
+    Puedo escribir
+    Lo que quiera
+        Con el formato que quiera
+    Y los caracteres "'\n\\# que me de la gana
+    Y se respeta tal cual. LITERALMENTE 
+    Tan solo se quita el sangrado de la primera linea,
+    a todas. |
+    | y sigo
+    
+
+---
+# Folded 
+# Funciona igual que la literal, pero
+# Los saltos de line se reemplazan por espacios en blanco
+# Ideal para comandos
+>-2
+    kubectl get pods 
+                     -n minamespace
+                     - o wide
+
+---
+# Otros nodos escalares
+# Fechas: En formato ISO
+2007-11-03T13:18:05
+
+---
+# Valores nulos
+~
+---
+# Nodos de tipo coleccion
+#    Agrupan varios nodos que pueden ser de ditintos tipos
+--- 
+# En YAML hay bastantes tipos de datos de colección
+# - Listas ORDENADAS
+# - Diccionarios NO ORDENADOS
+# - Listas DESORDENADAS     Muy poco frecuente
+# - Diccionarios ORDENADOS  Muy poco frecuente
+---
+# Listas: Secuencia ordenada de nodos:
+# Sintaxis:
+- dato1
+- 3
+- True
+---
+# Sintaxis alternativa:
+[ dato1, 3, True ]
+# PERFECTAMENTE VALIDA. Y QUE ESTA PROHIBIDO UTILIZAR ! No se usa, ya que:
+# El archivo va a ir a un Sistema de control de versiones. GIT. Y alli se identifican cambios a nivel de LINEA
+[ 
+    dato1, 
+    3, 
+    True
+] # Pero escribirlo así sería un poco de Pringaos
+---
+# Diccionarios / Mapa / Array asociativo / Tabla clave:valor
+# Colección de nodos DESORDENADAS, donde cada nodo es identificado por una clave
+clave1: valor1
+clave2: 3
+clave3: True
+---
+# Sintaxis alternativa
+{ clave1: valor1, clave2: 3, clave3: True }
+# Ya os imaginais
+---
+# Los nodos de tipo coleccion a su vez pueden incluir más nodos de tipo coleccion
+clave1: hola
+clave2: 
+    - item1
+    - 3
+    - True
+    - subclave2: item1
+      subclave3: 
+        - - otroitem1
+          - otroitem2
+        - otro mas
+# Este es el tipo de documento YAML más común
+---
+# NOTAS
+clave1:
+    - hola
+    - adios
+clave2:
+                    - hola
+                    - adios
+# Es valido ese documento? 
+# PERFECTAMENTE VALIDO. YAML no imponen niguna regla de sangrado. Más allá de que si un elemento d coleccion, contiene otro dentro
+# Debe escribirse el de dentro más sangrado hacia la derecha. Cuanto mas? LO QUE QUIERA.
+# Solo me pide que sea consecuente con los sangrados EN CADA NIVEL
+# Es de CAPULLOS hacer eso de ahí, tal y como yo lo he puesto, pero PERFECTAMENTE VALIDO !
+---
+# NOTA 2
+clave1:                         valor
+clave2muylargaquetecagas:       otro valor # YAML se come todos los espacios en blanco de ahí en medio
+---
+clave2muylargaquetecagas: otro valor
+clave1: valor
+
+# ESTOS DOCUS DOCUMENTOS se consideran IGUALES, a pesar de los espacios y el orden.
+---
+# Cada programa que decide usar YAML, implementa lo que se denomina SU PROPIO ESQUEMA
+# Donde define la estructura que debe tener el documento
