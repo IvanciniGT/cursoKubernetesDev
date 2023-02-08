@@ -5,7 +5,8 @@ metadata:
     name:       servicio-ivan   # FQDN que se da de altan en el DSN de kubernetes
 
 spec:
-    type: ClusterIP
+    #type: ClusterIP
+    type: NodePort
     
     selector:
         app:    miwebserver
@@ -13,3 +14,4 @@ spec:
     ports:
         -   port:       80 # Puerto en la IP  de balanceo
             targetPort: 80 # Puerto en los contenedores
+            nodePort:  30080 # Exposicion de puertos
