@@ -113,7 +113,7 @@ Que Kubernetes traduce automaticamente al Proxy reverso de turno
     BALANCEADOR DE CARGA                                                          |                 app1.produccion.es
         |                                                                         |                    MenchuPC
         172.30.2.1                                                                |                       |
-        |         :80 -> [172.30.1.1:30000, 172.30.1.2:30000, 172.30.1.3:30000]   |                  172.30.0.178
+        |         :80 -> [172.30.1.1:30100, 172.30.1.2:30100, 172.30.1.3:30100]   |                  172.30.0.178
         |                                172.30.0.0 /16                           |                       |
 -------------------------------------- RED DE LA EMPRESA --------------------------------------------------------------------------
     |                                                                                           
@@ -124,35 +124,43 @@ Que Kubernetes traduce automaticamente al Proxy reverso de turno
     ||                      NetFilter
     ||                          10.20.0.1:3000   -> [10.10.0.3:3306] round robin
     ||                          10.20.0.2:8080   -> [10.10.0.1:80, 10.10.0.2:80] round robin
-    ||                          172.30.1.1:30000 -> 10.20.0.2:8080
+    ||                          10.20.0.3:80     -> [10.10.0.4:80, 10.10.0.5:80] round robin
+    ||                          172.30.1.1:30100 -> 10.20.0.3:80
     ||------------------ Pod 1 Apache ---- 10.10.0.1 
     ||                      configuración:
     ||                          BBDD=basedatos.produccion.es:3300 Funciona? SI, Resuelta esa comunicación? NO (1)
+    ||
+    ||------------------ Pod 1 INGRESS CONTROLLER (nginx) ---- 10.10.0.4
+    ||                                  REGLA INGRESS       app1.produccion.es  ->  apaches.produccion.es
     ||
     |== 172.30.1.2 -- Maquina 2
     ||                  Linux
     ||                      NetFilter
     ||                          10.20.0.1:3000   -> [10.10.0.3:3306] round robin
     ||                          10.20.0.2:8080   -> [10.10.0.1:80, 10.10.0.2:80] round robin
-    ||                          172.30.1.2:30000 -> 10.20.0.2:8080
+    ||                          10.20.0.3:80     -> [10.10.0.4:80, 10.10.0.5:80] round robin
+    ||                          172.30.1.2:30100 -> 10.20.0.3:80
     ||------------------ Pod 2 Apache ---- 10.10.0.2 
     ||                      configuración:
     ||                          BBDD=basedatos.produccion.es:3300 Funciona? SI, Resuelta esa comunicación? NO
     ||
+    ||------------------ Pod 1 INGRESS CONTROLLER (nginx) ---- 10.10.0.5
+    ||                                  REGLA INGRESS       app1.produccion.es  ->  apaches.produccion.es
     |== 172.30.1.3 -- Maquina 3
     ||                  Linux
     ||                      NetFilter
     ||                          10.20.0.1:3000   -> [10.10.0.3:3306] round robin
     ||                          10.20.0.2:8080   -> [10.10.0.1:80, 10.10.0.2:80] round robin
-    ||                          172.30.1.3:30000 -> 10.20.0.2:8080
+    ||                          10.20.0.3:80     -> [10.10.0.4:80, 10.10.0.5:80] round robin
+    ||                          172.30.1.3:30100 -> 10.20.0.3:80
     ||------------------ Pod 1 MySQL  ---- 10.10.0.3:3306
     ||                       mysqld                  
     ||
-    ||
     ||--- Servidor DNS
-            basedatos.produccion.es -> IP FIJA -> 10.20.0.1
-            apaches.produccion.es   -> IP FIJA -> 10.20.0.2
-
+            basedatos.produccion.es -> IP FIJA -> 10.20.0.1     CLUSTER IP
+            apaches.produccion.es   -> IP FIJA -> 10.20.0.2     CLUSTER IP
+            ingress.micluster.es    -> IP FIJA -> 10.20.0.3     LOAD BALANCER > NODE PORT > CLUSTER IP
+            
 Automáticamente Kubernetes:
 - Si uno de los pods cae, Kubernetes se encarga de ACTUALIZAR INMEDIATAMENTE TODAS LAS REGLAS DE NETFILTER DE TODOS LOS SERVICIOS QUE USARAN LA IP que se cayo
   para quitarla
@@ -270,3 +278,53 @@ out of the box !                                                                
 Si estoy montando un cluster de Kubernetes en mis instalaciones (on premisses) tengo que montar el UNICO balanceador compatible con Kubernetes:
 METALLB
 
+
+
+## Esquema de comunicaciones
+
+              ROUTE
+          El despliegador         Admisnitardor del cluster                                                    El que despliega la aplicación
+           |------------|  |----------------------------------------------------------------------------|    |---------------------------------------------------------------|
+Menchu --> app1.prod.es ---> BALANCEADOR EXTERNO ----> MAQUINA n DEL CLUSTER    ----> BALANCEAO INTERNO  ---> POD IngressController ---> BALANCEO SERVICIO  ---> POD Servicio
+            DNS Externo         Una maquina             Redirección                     Regla net filter        Regla INGRESS               DNS Interno
+                                del cluster             Servicio IngressController
+                                                        DNS Interno
+                                                        
+                                                        
+A cada pod le asignamos una cantidad de recursos del host:
+
+HOST: Maquina 7 del cluster:        128 Gbs RAM         32 Cores
+    Nginx-IngressController         16 Gbs               4 cores            Será capaz de atender x peticiones/minuto
+    MySQL                           32 Gbs               4 cores
+    Apache WP                       12 Gbs               2 Cores
+    Nginx-IngressController         16 Gbs               4 cores            Será capaz de atender x peticiones/minuto
+    
+Si tengo Y peticiones por minuto donde Y > x... el pod del Nginx no da abasto.... y necesito UN CLUSTER ACTIVO / ACTTIVO  (ESCALABILIDAD)
+
+
+DE cara a determinar la configuración OPTIMA de una aplicación, necesito DATOS REALES de como funciona esa aplciación:
+Y ESOS DATOS SOLO SOLO salen de un sitio: MONITORIZACION
+             =========
+
+Compo primera aproximación lo que me interesa es que el ratio entre RAM y COREs esté balanceado
+
+nginx                              16Gbs                4 cores                 2 cores REQUIRE 16Gbs de RAM
+                                                                                    + Escalar por que me quedo sin RAM
+                                                                                    Hay 2 cores que no uso.
+nginx                              16Gbs                4 cores
+nginx                              16Gbs                4 cores
+nginx                              16Gbs                4 cores
+nginx                              16Gbs                4 cores
+nginx                              16Gbs                4 cores
+                                                                    12 cores del cluster SIN USO, pero bloqueados... JODIDO VOY 
+
+En cualquier caso, como eso es complejo (MONITORIZACION INTENSIVA)
+Kubernetes hace de las suyas para optimizar el uso de recursos y evitar destrozos de recursos al cluster
+
+Cuando configuro un POD le asociamos:
+    - El mínimo de CPU que quiero que se me garantice para el POD   - Reales \                          MAS CONSERVADOR
+    - El mínimo de RAM que quiero que se me garantice para el POD   - Reales / Bien balanceados entre si
+    - El maximo de CPU que querría, si hay hueco que me dejases     - Hasta el infinito y más allá 
+    - El maximo de RAM que querría, si hay hueco que me dejases     - El mismo dato que arriba (LEY. NUNCA PONGO OTRA COSA. IMPRESCINDIBLE)
+    
+    
