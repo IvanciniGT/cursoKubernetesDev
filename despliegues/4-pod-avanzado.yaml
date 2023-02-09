@@ -2,7 +2,7 @@ kind:           Pod
 apiVersion:     v1
 
 metadata:       
-    name:       pod-ivan-avanzado
+    name:       pod-ivan-avanzado-2
 
 spec:
     #initContainers:
@@ -18,13 +18,13 @@ spec:
             resources: 
                 requests: 
                                 # No pido CPUs, sino TIEMPO DE USO DE CPU
-                    cpu:        2000m   # Pido que se me reserve el equivalente a usar 2 cores al 100%
+                    cpu:        500m   # Pido que se me reserve el equivalente a usar 2 cores al 100%
                                         # Que podría bien ser 4 cores al 50%
                                         # U 8 cores al 25%
-                    memory:     4Gib
+                    memory:     1Gi
                 limits:
                     cpu:        8000m
-                    memory:     4Gib
+                    memory:     1Gi
 
             volumeMounts:
                 - name: datos
@@ -35,7 +35,10 @@ spec:
         - name: datos
           # Donde se van a guardar realmente esos "datos"
           # Que tipo de volumen voy a usar
-          emptyDir: {}              # En disco
+          #emptyDir: {}              # En disco
           emptyDir:                 # En RAM
-            medium: 'memory'
+            medium: 'Memory'
 
+          nfs:
+            server: nfs-server.default.svc.cluster.local    # Servidor en red nfs
+            path: "/"                                       # 
