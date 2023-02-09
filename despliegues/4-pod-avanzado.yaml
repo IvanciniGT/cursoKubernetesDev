@@ -1,0 +1,41 @@
+kind:           Pod   
+apiVersion:     v1
+
+metadata:       
+    name:       pod-ivan-avanzado
+
+spec:
+    #initContainers:
+        # Lista de contenedores que ejecuten tareas (scripts, comandos)
+        # Tareas que deben ejecutarse ANTES de los contenedores, y que se irán ejecutando SECUENCIALMENTE
+    containers:
+        # Si tengo varios contenedores, éstos se ejecutan EN PARALELO, SIMULTANEAMENTE
+        -   name:  contenedor1
+            image: nginx:1.23
+            
+            # Los contenedores podían tener limitación de acceso a recursos HW
+            # Esto es básico en entornos de producción, por qué?
+            resources: 
+                requests: 
+                                # No pido CPUs, sino TIEMPO DE USO DE CPU
+                    cpu:        2000m   # Pido que se me reserve el equivalente a usar 2 cores al 100%
+                                        # Que podría bien ser 4 cores al 50%
+                                        # U 8 cores al 25%
+                    memory:     4Gib
+                limits:
+                    cpu:        8000m
+                    memory:     4Gib
+
+            volumeMounts:
+                - name: datos
+                  mountPath: /datos
+            
+    # volumenes
+    volumes:
+        - name: datos
+          # Donde se van a guardar realmente esos "datos"
+          # Que tipo de volumen voy a usar
+          emptyDir: {}              # En disco
+          emptyDir:                 # En RAM
+            medium: 'memory'
+
