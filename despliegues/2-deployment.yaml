@@ -18,3 +18,4 @@ spec:
             containers:
                 -   name:  contenedor1
                     image: nginx:1.23
+                    

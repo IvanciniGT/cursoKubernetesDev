@@ -41,3 +41,17 @@ Para crear / modificar OBJETOS / CONFIGURACION, usamos:
 kubectl create -f   ARCHIVO_METADATOS_KUBERNETES.yaml       CREAR CONFIGURACIONES
 kubectl apply -f    ARCHIVO_METADATOS_KUBERNETES.yaml       CREAR o MODIFICAR CONFIGURACIONES
 kubectl delete -f   ARCHIVO_METADATOS_KUBERNETES.yaml       BORRAR CONFIGURACIONES
+
+
+# CONTENEDORES. Ejecutar comandos y acceso a logs 
+
+kubectl logs NOMBRE_POD -c NOMBRE_CONTENEDOR -n NAMESPACE
+
+kubectl exec NOMBRE_POD -c NOMBRE_CONTENEDOR -n NAMESPACE -- COMANDO
+                                                             ls
+                                                             cat
+
+kubectl exec -it NOMBRE_POD -c NOMBRE_CONTENEDOR -n NAMESPACE -- COMANDO
+                                                                 bash
+                                                                 mysql
+                                                                 python
