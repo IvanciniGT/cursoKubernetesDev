@@ -1,3 +1,39 @@
+kind:           PersistentVolume            # Lo rellena ADMINISTRACION DEL CLUSTER
+apiVersion:     v1
+
+metadata:       
+    name:       volumen-1878374562834
+
+spec:
+    capacity:
+        storage: 20Gi                       # Espacio
+    storageClassName: rapidito-redundante   # Con unas características
+    accessModes:
+        - ReadWriteOnce
+    # EL TIPO... que ya no escribe DESARROLLO, sino lo escribe ADMISNITRACION DEL CLUSTER
+    nfs:
+        server: nfs-server.default.svc.cluster.local    # Servidor en red nfs
+        path: "/" 
+    #awsElasticBlockStore:
+          #  volumeID: "vol-08836614756acc29b"
+          #  fsType: ext4
+
+---
+kind:           PersistentVolumeClaim       # Lo rellena DESARROLLO
+apiVersion:     v1
+
+metadata:       
+    name:       peticion-de-volumen-ivan
+
+spec:
+    resources:
+        requests:
+            storage: 10Gi                   # Espacio
+    storageClassName: rapidito-redundante   # Con unas características
+    accessModes:
+        - ReadWriteOnce
+---
+
 kind:           Pod   
 apiVersion:     v1
 
@@ -36,9 +72,18 @@ spec:
           # Donde se van a guardar realmente esos "datos"
           # Que tipo de volumen voy a usar
           #emptyDir: {}              # En disco
-          emptyDir:                 # En RAM
-            medium: 'Memory'
+          #emptyDir:                 # En RAM
+          #  medium: 'Memory'
 
-          nfs:
-            server: nfs-server.default.svc.cluster.local    # Servidor en red nfs
-            path: "/"                                       # 
+          #nfs:
+          #  server: nfs-server.default.svc.cluster.local    # Servidor en red nfs
+          #  path: "/"                                       # El volumen exportado por el servidor
+          #awsElasticBlockStore:
+          #  volumeID: "vol-08836614756acc29b"
+          #  fsType: ext4
+          # Podría configurar estas cosas.... pero no lo voy a hacer NUNCA JAMAS EN LA VIDA...
+          # DESPEDIDO SI LO HACES
+          
+          # Lo que voy a ha pedir un volumen con unas características
+          persistentVolumeClaim:
+            claimName: peticion-de-volumen-ivan

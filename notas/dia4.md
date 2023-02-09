@@ -521,9 +521,57 @@ En Kubernetes hablamos de 2 tipos de VOLUMENES:
     nfs
     vsphereVolume
 
+Nos estamos dando cuenta que:
+
+En los volumenes no persistentes, no hay problema:
+- emptyDir
+- configMap
+- secret
+
+Si quiero usar volumenes persistentes, la configuración del volumen depende del TIPO DE VOLUMEN que vaya a montar.
+
+PREGUNTA !
+
+Quien rellena el fichero donde se define la plantilla del POD, y por ende los volumenes?
+
+EL EQUIPO DE DESARROLLO, con potencial ayuda de algunos compis que sepan del tema y de escribir estos ficheros.
+
+Y AL EQUIPO DE DESARROLLO, le importa un huevo, DONDE REALMENTE se esté guardando el dato? NO LE IMPORTA
+                                                                                            Y NO DEBE SABERLO
+
+DE QUIEN ES REPONSABILIDAD ELEGIR LA UBICACION DE LOS DATOS?
+
+Del administrador del cluster de Kubernetes y la gente de almacenamiento.
+
+
+A mi, COMO DESARROLLO, COMO DUEÑO DEL PRODUCTO QUE ESTOY INSTALANDO, qué me interesa?
+Tener un sitio donde poder guardar datos.... cualquier sitio? NO. Uno que cumple con mis necesidades:
+QUE VOY A PEDIR:
+    50 Gbs de almacenamiento
+    encriptados? SI / NO
+    velocidad del almacenamiento: RAPIDITO, NORMALITO o LENTITO
+    NIVEL DE REDUNDANCIA: x3, x4
+
+10 Gbs rapiditos 
+40 Gbs lentos para backups
+
+Hace 20 años, cuando íbamos a pasar un sistema a producción, que hacíamos? SOY DESARROLLO
+Qué me preguntaban los de sistemas?
+- Dame cpu
+- Dame memoria
+- Dime cuanto espacio necesitas
+
+# Quien vincula el pv y el pvc? KUBERNETES
+
+Kubernetes busca una pv que sea capaz de atender una PVC... y las asigna
+
+Cojonudo, asigno el PV volumen-1878374562834 a la PVC peticion-de-volumen-ivan
 
 
 
 
+Voy al mediamark YO (desarrollo) y esta el pollo del mediamark (admisnitracion) y le digo
 
-
+Quiero un volumen de 4,76 Tbs
+El del mediamark se parte el culo... y me dice... Tengo uno de 6 Tbs... 
+Y yo... pues me lo llevo.... Es el que hay.
