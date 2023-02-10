@@ -15,18 +15,6 @@ spec:
     accessModes:
         - ReadWriteOnce
 ---
-kind:           PersistentVolumeClaim
-apiVersion:     v1
-metadata:       
-    name:       pvc-bbdd
-spec:
-    resources:
-        requests:
-            storage: 2Gi            
-    storageClassName: redundante-rapidito
-    accessModes:
-        - ReadWriteOnce
----
 kind:           PersistentVolume   
 apiVersion:     v1
 metadata:       
@@ -90,15 +78,30 @@ spec:
         -   port:       3306
             targetPort: 3306
 ---
-kind:           Deployment   
+kind:           StatefulSet   
 apiVersion:     apps/v1
 metadata:       
-    name:       deployment-mariadb 
+    name:       statefulset-mariadb 
 spec:
     replicas:       1
+        # Cada pod recibiria el nombre? statefulset-mariadb-0
+        #                               statefulset-mariadb-1
+    serviceName: servicio-mariadb
+        # statefulset-mariadb-0.servicio-mariadb
+        # statefulset-mariadb-1.servicio-mariadb
     selector:
         matchLabels:
                 app:    mariadb
+    volumeClaimTemplates:
+        -   metadata:       
+                name:       pvc-bbdd
+            spec:
+                resources:
+                    requests:
+                        storage: 2Gi            
+                storageClassName: redundante-rapidito
+                accessModes:
+                    - ReadWriteOnce
     template:
         metadata:       
             name:       plantilla-mariadb 
@@ -152,7 +155,7 @@ apiVersion:     apps/v1
 metadata:       
     name:       deployment-wp 
 spec:
-    replicas:       1
+    replicas:       2
     selector:
         matchLabels:
                 app:    wp
@@ -166,6 +169,19 @@ spec:
                 -   name: datos
                     persistentVolumeClaim:
                         claimName: pvc-wp
+            
+            affinity:
+                podAffinity:
+                    podAntiAffinity:
+                      preferredDuringSchedulingIgnoredDuringExecution:
+                        - podAffinityTerm:
+                            labelSelector:
+                              matchLabels:
+                                app:    wp
+                            topologyKey: kubernetes.io/hostname
+                          weight: 1
+                    nodeAffinity:
+                      
             containers:
                 -   name:  contenedor
                     image: wordpress:6.1

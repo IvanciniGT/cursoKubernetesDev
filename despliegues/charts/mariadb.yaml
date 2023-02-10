@@ -204,7 +204,7 @@ spec:
                   if [[ -f "${MARIADB_ROOT_PASSWORD_FILE:-}" ]]; then
                       password_aux=$(cat "$MARIADB_ROOT_PASSWORD_FILE")
                   fi
-                  mysqladmin status -uroot -p"${password_aux}"
+                  mysql -u"" -p"${password_aux}" < SELECT 1
           resources: 
             limits: {}
             requests: {}

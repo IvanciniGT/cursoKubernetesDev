@@ -139,3 +139,190 @@ Vosotros solitos ! con vuestras manitas(manazas) !
 Ahora mismo no tenemos disponible un ingresscontroller en nuestro cluster.
 
 Por lo tanto  la única forma de exponer el servicio de WP es mediante un Servicio node port
+---
+
+# Afinidades
+
+## Afinidad a nivel de nodo
+
+    nodeName: ip-172-31-0-253   Que ya no tengo HA 
+
+    nodeSelector:
+        etiqueta: valor         Etiqueta que tienen que tener los NODOS en los que este pod se despliegue
+                                Esto sirve para? 
+                                    Nodos con ciertas características especiales:
+                                        Arquitectura de Hardware
+        kubernetes.io/arch: amd64
+                                        Gráfica GPU : Machine learning, Data mining, Deep learning
+
+    affinity:
+        nodeAffinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: topology.kubernetes.io/zone
+                    operator: In # NotIn # Exists DoesNotExists Gt Lt
+                    values:
+                    - antarctica-east1
+                    - antarctica-west1
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 1
+                preference:
+                  matchExpressions:
+                  - key: another-node-label-key
+                    operator: In
+                    values:
+                    - another-node-label-value
+              - weight: 2
+                preference:
+                  matchExpressions:
+                  - key: another-node-label-key
+                    operator: In
+                    values:
+                    - another-node-label-value
+    
+## Afinidad a nivel de pod
+
+## Antiafinidad a nivel de pod
+
+Esta es la más usada de todas las reglas de afinidad..
+Casi siempre queiro antiafinidad conmigo mismo
+    
+
+    YO soy un pod con la etiqueta: app=wp
+
+    affinity:
+
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: NotIn
+                values:
+                - wp
+            topologyKey: zone
+            
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - wp
+            topologyKey: zone
+                        # kubernetes.io/hostname
+                         maquinas-potentes
+
+
+
+zona geografica 1
+                            AFINITY         ANTIAFFINITY
+    Maquina 1                   √               x
+        NADA
+    Maquina 2                   √               x
+        app: wp                
+    Maquina 3                   √               x
+        app: bbdd               
+    Maquina 4                   √               x
+        app: wp
+        app: bbdd
+
+zona geografica 2
+                            AFINITY         ANTIAFFINITY
+    Maquina 1                   x               x
+        NADA
+    Maquina 2                   x               x
+        app: wp                
+
+zona geografica 3
+                            AFINITY         ANTIAFFINITY
+    Maquina 1                   √               √
+        NADA
+    Maquina 2                   √               √
+        app: bbdd                
+
+
+Imaginate que quieres desplegar WP en tu cluster
+
+Tu tienes un cluster en 3 zonas geograficas
+
+Quiero desplegar el WP allá donde no haya ya un WP 
+    Antiafinidad contigo mismo pero a nivel no de máquina, sino de zona
+    Donde "zona" es un label que TU HAS PUESTO CON ESE NOMBRE PORQUE TE HA DADO LA GANA 
+    a todas las maquinas de la misma zona geografica
+
+    Antiafinidad con pods wp a nivel de zona (topologia zona)
+
+Replicas: 3
+
+Madrid
+    Maquina 1
+    Maquina 2
+        WP1 
+    Maquina 3
+    Maquina 4
+Cataluña
+    Maquina 1
+    Maquina 2
+    Maquina 3
+        WP2
+    Maquina 4
+Andalucia
+    Maquina 1
+        WP3
+    Maquina 2
+    Maquina 3
+    Maquina 4
+
+
+# Pruebas
+
+Cuando un pod no está operativo que hace Kubernetes? 
+              -----------------
+
+Qué significa que un pod no está operativo?
+
+Cuándo se considera que un pod no está operativo?
+- Cuando el proceso principal no se está ejecutando. 
+  ES CIERTO... pero solo es el muy principio de este tema en KUBERNETES !
+
+Evidentemente si lanzo un poc con nginx.... y el proceso de nginx se cae, el pod hay que reiniciarlo.
+No está operativo.
+
+Pero... El hecho de que el proceso esté corriendo es GARANTIA SUFICIENTE de que todo esté bien?
+De que el nginx esté "operativo"? NO
+Puede estar el proceso pillao.
+
+En ese caso Kubernetes lo reiniciaría? El problema es que Kubernetes no entiende el significado de la palabra "pillao"
+Al menos a priori.
+
+En kubernetes un pod que ya esté asignado tiene 3 estados:
+- INICIALIZANDO
+- CORRIENDO
+- LISTO
+
+Y para cada uno de los estados, EN KUBERNETES HEMOS OGLIGATORIAMENTE de definir las pruebas que demuestren que está en ese estado.
+
+MYSQL
+Inicializando:  Si el proceso está operativo: Lo dejo que siga su curso
+Corriendo:      Conectarme a la BBDD y ver si está montada ... pero con usuario administrador
+Listo:          Conectarme con un usuario normal y hacer queries
+
+Un backup en frio
+- Necesito bloquear el acceso a todos los usuarios salvo al administrador.
+
+El pod está LISTO para prestar servicio? NO
+Pero está corriendo? SI y lo debo respetar? SI
+
+Si un pod no está inicializado: KUBERNETES LO MATA y lo lanza de nuevo
+Si un pod no está corriendo:    KUBERNETES LO MATA y lo lanza de nuevo
+Si un pod no está listo:        KUBERNETES LO SACA DEL BALANCEADOR DE CARGA y espera
+                                a qué esté LISTO para meterlo en el balanceador de carga (SERVICIO)
+
+
+
+
+
