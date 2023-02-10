@@ -1,0 +1,202 @@
+kind:           Namespace  
+apiVersion:     v1
+metadata:   
+    name:       wordpress
+---
+kind:           PersistentVolumeClaim
+apiVersion:     v1
+metadata:       
+    name:       pvc-wp
+spec:
+    resources:
+        requests:
+            storage: 2Gi            
+    storageClassName: redundante  
+    accessModes:
+        - ReadWriteOnce
+---
+kind:           PersistentVolumeClaim
+apiVersion:     v1
+metadata:       
+    name:       pvc-bbdd
+spec:
+    resources:
+        requests:
+            storage: 2Gi            
+    storageClassName: redundante-rapidito
+    accessModes:
+        - ReadWriteOnce
+---
+kind:           PersistentVolume   
+apiVersion:     v1
+metadata:       
+    name:       volumen-bbdd
+spec:
+    capacity:
+        storage: 2Gi  
+    storageClassName: redundante-rapidito  
+    accessModes:
+        - ReadWriteOnce
+    hostPath: 
+        path: /home/ubuntu/environment/datos/bbdd
+        type: DirectoryOrCreate
+---
+kind:           PersistentVolume   
+apiVersion:     v1
+metadata:       
+    name:       volumen-wp
+spec:
+    capacity:
+        storage: 2Gi  
+    storageClassName: redundante  
+    accessModes:
+        - ReadWriteOnce
+    hostPath: 
+        path: /home/ubuntu/environment/datos/wp
+        type: DirectoryOrCreate
+---
+kind:           Secret
+apiVersion:     v1
+metadata:
+    name:       datos-bbdd
+data:
+    contrasenaJefe:     cGFzc3dvcmQ=        # password
+    contrasenaUsuario:  cGFzc3dvcmQ=        # password
+    usuario:            dXN1YXJpbw==        # usuario
+    baseDatos:          YmJkZHdw            # bbddwp
+---
+kind:           Service   
+apiVersion:     v1
+metadata:       
+    name:       servicio-wp
+spec:
+    type: NodePort
+    selector:
+        app:    wp
+    ports:
+        -   port:       80
+            targetPort: 80
+            nodePort:  30100 
+---
+kind:           Service   
+apiVersion:     v1
+metadata:       
+    name:       servicio-mariadb
+spec:
+    type: ClusterIP
+    selector:
+        app:    mariadb
+    ports:
+        -   port:       3306
+            targetPort: 3306
+---
+kind:           Deployment   
+apiVersion:     apps/v1
+metadata:       
+    name:       deployment-mariadb 
+spec:
+    replicas:       1
+    selector:
+        matchLabels:
+                app:    mariadb
+    template:
+        metadata:       
+            name:       plantilla-mariadb 
+            labels: 
+                app:    mariadb
+        spec:
+            volumes:
+                -   name: datos
+                    persistentVolumeClaim:
+                        claimName: pvc-bbdd
+            containers:
+                -   name:  contenedor
+                    image: mariadb:10.9
+                    imagePullPolicy: IfNotPresent
+                    resources:
+                        requests:
+                            cpu:    1
+                            memory: 1Gi
+                        limits:
+                            memory: 1Gi
+                    volumeMounts:
+                        -   name:       datos
+                            mountPath:  /var/lib/mysql
+                    env:
+                        -   name:           MARIADB_ROOT_PASSWORD
+                            valueFrom:
+                                secretKeyRef:
+                                    name:   datos-bbdd
+                                    key:    contrasenaJefe
+                                    
+                        -   name:           MARIADB_DATABASE
+                            valueFrom:
+                                secretKeyRef:
+                                    name:   datos-bbdd
+                                    key:    baseDatos
+                                    
+                        -   name:           MARIADB_USER
+                            valueFrom:
+                                secretKeyRef:
+                                    name:   datos-bbdd
+                                    key:    usuario
+                                    
+                        -   name:           MARIADB_PASSWORD
+                            valueFrom:
+                                secretKeyRef:
+                                    name:   datos-bbdd
+                                    key:    contrasenaUsuario
+---
+kind:           Deployment   
+apiVersion:     apps/v1
+metadata:       
+    name:       deployment-wp 
+spec:
+    replicas:       1
+    selector:
+        matchLabels:
+                app:    wp
+    template:
+        metadata:       
+            name:       plantilla-wp 
+            labels: 
+                app:    wp
+        spec:
+            volumes:
+                -   name: datos
+                    persistentVolumeClaim:
+                        claimName: pvc-wp
+            containers:
+                -   name:  contenedor
+                    image: wordpress:6.1
+                    imagePullPolicy: IfNotPresent
+                    resources:
+                        requests:
+                            cpu:    1
+                            memory: 1Gi
+                        limits:
+                            memory: 1Gi
+                    volumeMounts:
+                        -   name:       datos
+                            mountPath:  /var/www/html
+                    env:
+                        -   name:           WORDPRESS_DB_HOST
+                            value:          servicio-mariadb
+                                    
+                        -   name:           WORDPRESS_DB_NAME
+                            valueFrom:
+                                secretKeyRef:
+                                    name:   datos-bbdd
+                                    key:    baseDatos
+                                    
+                        -   name:           WORDPRESS_DB_USER
+                            valueFrom:
+                                secretKeyRef:
+                                    name:   datos-bbdd
+                                    key:    usuario
+                                    
+                        -   name:           WORDPRESS_DB_PASSWORD
+                            valueFrom:
+                                secretKeyRef:
+                                    name:   datos-bbdd
+                                    key:    contrasenaUsuario

@@ -135,3 +135,7 @@ Esos datos no van a estar AQUI metidos... Estarán aqui REFERENCIADOS !
 Llegados a este punto, YA ESTAIS EN DISPOSICION DE MONTAR NUESTRO WP !
 
 Vosotros solitos ! con vuestras manitas(manazas) !
+
+Ahora mismo no tenemos disponible un ingresscontroller en nuestro cluster.
+
+Por lo tanto  la única forma de exponer el servicio de WP es mediante un Servicio node port
