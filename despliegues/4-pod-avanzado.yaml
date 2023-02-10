@@ -29,9 +29,14 @@ spec:
             volumeMounts:
                 - name: datos
                   mountPath: /datos
+                - name: configuracion
+                  mountPath: /etc/nginx/conf.d
             
     # volumenes
     volumes:
+        - name: configuracion
+          configMap:
+            name: fichero-configuracion-nginx
         - name: datos
           # Donde se van a guardar realmente esos "datos"
           # Que tipo de volumen voy a usar
