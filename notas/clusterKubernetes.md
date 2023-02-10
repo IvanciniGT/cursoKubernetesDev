@@ -119,7 +119,7 @@ Que Kubernetes traduce automaticamente al Proxy reverso de turno
     |                                                                                           
     |   (Cluster de Kubernetes)
     |
-     
+    |== 172.30.1.1 -- Maquina 1
     ||                  Linux
     ||                      NetFilter
     ||                          10.20.0.1:3000   -> [10.10.0.3:3306] round robin

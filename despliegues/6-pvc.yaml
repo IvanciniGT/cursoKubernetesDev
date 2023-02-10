@@ -1,0 +1,13 @@
+kind:           PersistentVolumeClaim       # Lo rellena DESARROLLO
+apiVersion:     v1
+
+metadata:       
+    name:       peticion-de-volumen-ivan
+
+spec:
+    resources:
+        requests:
+            storage: 10Gi                   # Espacio
+    storageClassName: rapidito-redundante   # Con unas características
+    accessModes:
+        - ReadWriteOnce

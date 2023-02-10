@@ -1,0 +1,22 @@
+kind:           PersistentVolume            # Lo rellena ADMINISTRACION DEL CLUSTER
+apiVersion:     v1
+
+metadata:       
+    name:       volumen-1878374562834
+
+spec:
+    capacity:
+        storage: 20Gi                       # Espacio
+    storageClassName: rapidito-redundante   # Con unas características
+    accessModes:
+        - ReadWriteOnce
+    # EL TIPO... que ya no escribe DESARROLLO, sino lo escribe ADMISNITRACION DEL CLUSTER
+    #nfs:
+    #    server: nfs-server.default.svc.cluster.local    # Servidor en red nfs
+    #    path: "/" 
+    #awsElasticBlockStore:
+          #  volumeID: "vol-0faae7c5d1e2b1a43"
+          #  fsType: ext4
+    hostPath: # NO VALE PARA PRODUCCION. SOLO PARA JUGAR AQUI AHORA
+        path: /home/ubuntu/environment/datos/volumen1
+        type: DirectoryOrCreate

@@ -480,7 +480,7 @@ En Kubernetes hablamos de 2 tipos de VOLUMENES:
                                         
                                         SSD -> 0.65Gbs/seg PA MI, sin compartir PA MIIIII 
 
-- Compartir datos entre procesos (que estén correiendo en distintos contenedores)
+- Compartir datos entre procesos (que estén correiendo en distintos contenedores) del mismo pod
     Me importa realmente donde se estén guardando los datos? ME DA IGUAL !!!
          a en qué carpeta del HDD?
          a en qué posición de la memoria RAM? 
