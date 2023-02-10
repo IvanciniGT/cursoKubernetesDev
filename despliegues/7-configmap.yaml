@@ -38,8 +38,8 @@ metadata:
     name:       datos-bbdd
 
 data:
-    contraseñaJefe:     cGFzc3dvcmQ=
-    contraseñaUsuario:  cGFzc3dvcmQ=
+    contrasenaJefe:     cGFzc3dvcmQ=
+    contrasenaUsuario:  cGFzc3dvcmQ=
 # echo -n 'password' | base64
 ---
 

@@ -128,3 +128,10 @@ Y los admisnitardores deben tocar este fichero: LA PLANTILLA DE POD? NI
 Le corto las manos YO DESARROLLADOR 
 
 Esos datos no van a estar AQUI metidos... Estarán aqui REFERENCIADOS !
+
+
+---
+
+Llegados a este punto, YA ESTAIS EN DISPOSICION DE MONTAR NUESTRO WP !
+
+Vosotros solitos ! con vuestras manitas(manazas) !

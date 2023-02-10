@@ -11,25 +11,42 @@ spec:
     containers:
         -   name: bbdd
             image: mysql:8.0
+            imagePullPolicy: IfNotPresent # Always
             
             #envFrom: 
             env:
+#                - name:     MYSQL_ROOT_PASSWORD
+#                  value:    password
+
                 - name:     MYSQL_ROOT_PASSWORD
-                  value:    password
+                  valueFrom: 
+                    secretKeyRef:
+                        name: datos-bbdd
+                        key: contrasenaJefe
                   
                 - name:     MYSQL_DATABASE
-                  value:    basedatos
-                  
+                  valueFrom: 
+                    configMapKeyRef:
+                        name: datos-bbdd
+                        key: nombre_dase_datos     
+                        
                 - name:     MYSQL_USER
-                  value:    usuario
-                  
+                  valueFrom: 
+                    configMapKeyRef:
+                        name: datos-bbdd
+                        key: usuario         
+                        
                 - name:     MYSQL_PASSWORD
-                  value:    password
+                  valueFrom: 
+                    secretKeyRef:
+                        name: datos-bbdd
+                        key: contrasenaUsuario
             
         # Si tengo varios contenedores, éstos se ejecutan EN PARALELO, SIMULTANEAMENTE
         -   name:  contenedor1
             image: nginx:1.23
-            
+            imagePullPolicy: IfNotPresent # Always
+
             # Los contenedores podían tener limitación de acceso a recursos HW
             # Esto es básico en entornos de producción, por qué?
             resources: 
