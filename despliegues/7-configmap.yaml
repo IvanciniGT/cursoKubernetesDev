@@ -20,5 +20,27 @@ data:
                             root   /datos;
                         }
                     }
+---
+kind:           ConfigMap
+apiVersion:     v1
+
+metadata:
+    name:       datos-bbdd
+
+data:
+    usuario:            usuario
+    nombre_dase_datos:  basedatos
+---
+kind:           Secret
+apiVersion:     v1
+
+metadata:
+    name:       datos-bbdd
+
+data:
+    contraseñaJefe:     cGFzc3dvcmQ=
+    contraseñaUsuario:  cGFzc3dvcmQ=
+# echo -n 'password' | base64
+---
 
 # /etc/nginx/conf.d/default.conf

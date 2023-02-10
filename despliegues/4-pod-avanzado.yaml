@@ -9,6 +9,23 @@ spec:
         # Lista de contenedores que ejecuten tareas (scripts, comandos)
         # Tareas que deben ejecutarse ANTES de los contenedores, y que se irán ejecutando SECUENCIALMENTE
     containers:
+        -   name: bbdd
+            image: mysql:8.0
+            
+            #envFrom: 
+            env:
+                - name:     MYSQL_ROOT_PASSWORD
+                  value:    password
+                  
+                - name:     MYSQL_DATABASE
+                  value:    basedatos
+                  
+                - name:     MYSQL_USER
+                  value:    usuario
+                  
+                - name:     MYSQL_PASSWORD
+                  value:    password
+            
         # Si tengo varios contenedores, éstos se ejecutan EN PARALELO, SIMULTANEAMENTE
         -   name:  contenedor1
             image: nginx:1.23
@@ -31,6 +48,8 @@ spec:
                   mountPath: /datos
                 - name: configuracion
                   mountPath: /etc/nginx/conf.d
+            
+            # Variables de entorno!
             
     # volumenes
     volumes:

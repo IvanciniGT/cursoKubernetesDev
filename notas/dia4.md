@@ -98,6 +98,8 @@ Permite guardar COSAS en la BBDD de kubernetes
 
 ## Secret
 
+Permite guardar COSAS ENCRIPTADAS en la BBDD de kubernetes
+
 ## PersistentVolume
 
 ## PersistentVolumeClaim

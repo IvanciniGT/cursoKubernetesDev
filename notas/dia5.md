@@ -108,3 +108,23 @@ Dicho eso:
     Pero puede pasar que el gestor de volumenes no lo permita. En este caso: FOLLON !
     Me toca hacer PVC nueva, PV nuevo, VOLUMEN nuevo.
     Y a manita copiar los datos del volumen antiguo al nuevo!
+
+
+
+# Variables de entorno
+
+QUIEN RELLENA EL FICHERO CON LA PLANTILLA DEL POD? Desarrollador
+
+Y ese sabe el usuario y la password de la BBDD de producción? NI DE COÑA !
+Y ese sabe el usuario y la password de la BBDD de desarrollo? SI
+Y ese sabe el usuario y la password de la BBDD de pre-produccion? PUEDE 
+
+Cuantos usuarios y contraseñas vamos a meter aqui? LA HUEVA !
+
+Quien conoce los datos de la BBDD? DESARROLLO? NO...
+Administración de producción.
+
+Y los admisnitardores deben tocar este fichero: LA PLANTILLA DE POD? NI
+Le corto las manos YO DESARROLLADOR 
+
+Esos datos no van a estar AQUI metidos... Estarán aqui REFERENCIADOS !
