@@ -94,6 +94,8 @@ Reglas de configuración para un PROXY REVERSO (Ingress Controller)
 
 ## ConfigMap
 
+Permite guardar COSAS en la BBDD de kubernetes
+
 ## Secret
 
 ## PersistentVolume
